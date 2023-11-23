@@ -54,11 +54,10 @@ class EpsilonGreedyAgent :
 
 
 if __name__ == '__main__' :
-    # Numărul de brațe ale mașinii cu sloturi
-    num_arms = 5
-
-    # Numărul total de iterații
-    num_iterations = 1000
+    # Citirea numărului de brațe și numărului total de iterații din fișierul de intrare
+    with open('input.txt', 'r') as file :
+        num_arms = int(file.readline().strip())
+        num_iterations = int(file.readline().strip())
 
     # Crearea mașinii cu sloturi
     bandit = MultiArmedBandit(num_arms)
