@@ -1,10 +1,14 @@
+import time
+
 import numpy as np
 import matplotlib.pyplot as plt
 from tkinter import Label, Button, Entry, filedialog
+from tkinter.messagebox import askokcancel
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
+import os
 from src.algorithm.agents import UCB1Agent, EpsilonGreedyAgent
 from src.model.multiarmedbandit import MultiArmedBandit
+from tkinter import Menu
 
 
 class BanditSimulationGUI :
@@ -66,6 +70,14 @@ class BanditSimulationGUI :
         # Get the file path from the entry field
         file_path = self.entry_path.get()
 
+        # Create a menu bar
+        menubar = Menu(self.root)
+        self.root.config(menu=menubar)
+
+        # Add a "File" menu
+        file_menu = Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="File", menu=file_menu)
+
         # Read the number of arms, total iterations, and epsilon from the data file
         with open(file_path, 'r') as file :
             no_arms = int(file.readline().strip())
@@ -112,3 +124,22 @@ class BanditSimulationGUI :
 
         # Refresh the canvas
         self.canvas.draw()
+
+        # Add the "Save Plot" option to the menu
+        file_menu.add_command(label="Save Plot", command=self.save_plot)
+
+    def save_plot(self) :
+        # Save the plot to an output directory
+        output_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../../output')
+        if not os.path.exists(output_dir) :
+            os.makedirs(output_dir)
+
+        # Generate a unique filename based on timestamp for hour and second
+        timestamp = time.strftime("%Y.%m.%d_%H.%M.%S")
+        output_filename = os.path.join(output_dir, f'Output_{timestamp}.png')
+
+        # Save the figure to the output file
+        self.figure.savefig(output_filename)
+
+        # Open a dialog to confirm the save
+        askokcancel("Save Plot", f"Plot saved to:\n{output_filename}")
