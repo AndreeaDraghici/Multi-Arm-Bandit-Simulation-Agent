@@ -113,6 +113,9 @@ Visualize the results with a plot showing the average rewards over iterations fo
 
   In the menu bar, go to "File" and select "Save Plot" to save the generated plot to the output directory.
 
+![img.png](img.png)
+
+
 --------------------
 
 ### Output Structure
