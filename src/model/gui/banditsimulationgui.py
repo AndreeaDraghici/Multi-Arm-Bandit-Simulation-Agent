@@ -25,7 +25,7 @@ class BanditSimulationGUI :
         self.root.rowconfigure(2, weight=1)
 
         # Label, Entry, and Button for the file path
-        self.label_path = Label(root, text="Enter path to input file")
+        self.label_path = Label(root, text="Enter path to data file")
         self.label_path.grid(row=0, column=0, pady=5, sticky='e')
 
         self.entry_path = Entry(root, width=40)
@@ -46,9 +46,9 @@ class BanditSimulationGUI :
 
     def browse_file(self) :
         """
-        Opens a file dialog to select the input file and updates the entry field with the selected file path.
+        Opens a file dialog to select the data file and updates the entry field with the selected file path.
         """
-        # Open a file dialog to select the input file
+        # Open a file dialog to select the data file
         file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
 
         # Update the entry field with the selected file path
@@ -57,16 +57,16 @@ class BanditSimulationGUI :
 
     def run_simulation(self) :
         """
-        Runs the bandit simulation based on the provided input file.
+        Runs the bandit simulation based on the provided data file.
 
-        Reads the number of arms, total iterations, and epsilon from the input file,
+        Reads the number of arms, total iterations, and epsilon from the data file,
         creates a multi-armed bandit and agents, simulates iterations, and plots the results.
         """
 
         # Get the file path from the entry field
         file_path = self.entry_path.get()
 
-        # Read the number of arms, total iterations, and epsilon from the input file
+        # Read the number of arms, total iterations, and epsilon from the data file
         with open(file_path, 'r') as file :
             no_arms = int(file.readline().strip())
             num_iterations = int(file.readline().strip())
