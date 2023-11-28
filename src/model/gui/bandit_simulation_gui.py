@@ -1,5 +1,3 @@
-import time
-
 import numpy as np
 import matplotlib.pyplot as plt
 from tkinter import Label, Button, Entry, filedialog
@@ -9,7 +7,7 @@ import os
 from src.algorithm.agents import UCB1Agent, EpsilonGreedyAgent
 from src.model.multiarmedbandit import MultiArmedBandit
 from tkinter import Menu
-
+import time
 
 class BanditSimulationGUI :
     def __init__(self, root) :
