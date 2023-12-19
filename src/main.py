@@ -1,6 +1,6 @@
 from tkinter import Tk
 
-from src.model.gui.bandit_simulation_gui import BanditSimulationGUI
+from src.model.gui.BanditSimulationGUI import BanditSimulationGUI
 
 # Instantiate and run the GUI
 if __name__ == '__main__' :

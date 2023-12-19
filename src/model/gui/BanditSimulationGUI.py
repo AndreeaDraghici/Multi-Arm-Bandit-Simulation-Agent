@@ -1,16 +1,26 @@
+import logging
+
 import numpy as np
 import matplotlib.pyplot as plt
 from tkinter import Label, Button, Entry, filedialog
 from tkinter.messagebox import askokcancel
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
-from src.algorithm.agents import UCB1Agent, EpsilonGreedyAgent
-from src.model.multiarmedbandit import MultiArmedBandit
+
+from src.LoadLoggingConfiguration import load_logging_config
+from src.algorithm.Agents import UCB1Agent, EpsilonGreedyAgent
+from src.model.MultiArmedBandit import MultiArmedBandit
 from tkinter import Menu
 import time
 
+
 class BanditSimulationGUI :
     def __init__(self, root) :
+        load_logging_config()
+
+        # Get the logger for the 'staging' logger
+        self.logger = logging.getLogger('staging')
+
         """
         Initializes the BanditSimulationGUI.
         :param root: The Tkinter root window.
@@ -57,6 +67,8 @@ class BanditSimulationGUI :
         self.entry_path.delete(0, 'end')
         self.entry_path.insert(0, file_path)
 
+        self.logger.info(f"Selected data input file: {file_path}")
+
     def run_simulation(self) :
         """
         Runs the bandit simulation based on the provided data file.
@@ -67,6 +79,8 @@ class BanditSimulationGUI :
 
         # Get the file path from the entry field
         file_path = self.entry_path.get()
+
+        self.logger.info("Running bandit simulation based on the provided data file.")
 
         # Create a menu bar
         menubar = Menu(self.root)
@@ -92,6 +106,10 @@ class BanditSimulationGUI :
         # Lists to store average rewards
         avg_rewards_ucb1 = []
         avg_rewards_epsilon_greedy = []
+
+        self.logger.info(f"Number of arms: {no_arms}")
+        self.logger.info(f"Number of iterations: {num_iterations}")
+        self.logger.info(f"Epsilon value: {epsilon}")
 
         # Simulate iterations
         for i in range(num_iterations) :
@@ -139,5 +157,8 @@ class BanditSimulationGUI :
         # Save the figure to the output file
         self.figure.savefig(output_filename)
 
+        self.logger.info(f"Plot saved to: {f'Output_{timestamp}.png'}")
+
         # Open a dialog to confirm the save
         askokcancel("Save Plot", f"Plot saved to:\n{output_filename}")
+
