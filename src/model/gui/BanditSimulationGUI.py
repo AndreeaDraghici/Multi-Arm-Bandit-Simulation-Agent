@@ -1,5 +1,6 @@
 import logging
 
+import mplcursors
 import numpy as np
 import matplotlib.pyplot as plt
 from tkinter import Label, Button, Entry, filedialog, messagebox
@@ -19,6 +20,10 @@ class BanditSimulationGUI :
 
         # Get the logger for the 'staging' logger
         self.logger = logging.getLogger('staging')
+
+        self.no_arms = None
+        self.epsilon = None
+        self.num_iterations = None
 
         """
         Initializes the BanditSimulationGUI.
@@ -103,29 +108,29 @@ class BanditSimulationGUI :
             with open(file_path, 'r') as file :
                 # Verify and parse the structure of the file
                 try :
-                    no_arms = int(file.readline().strip())
-                    num_iterations = int(file.readline().strip())
-                    epsilon = float(file.readline().strip())
+                    self.no_arms = int(file.readline().strip())
+                    self.num_iterations = int(file.readline().strip())
+                    self.epsilon = float(file.readline().strip())
                 except ValueError as ve :
                     raise ValueError("Invalid file structure. Please make sure the file contains valid data.") from ve
 
             # Create the multi-armed bandit
-            bandit = MultiArmedBandit(no_arms)
+            bandit = MultiArmedBandit(self.no_arms)
 
             # Create the agents
-            ucb1_agent = UCB1Agent(no_arms)
-            epsilon_greedy_agent = EpsilonGreedyAgent(no_arms, eps=epsilon)
+            ucb1_agent = UCB1Agent(self.no_arms)
+            epsilon_greedy_agent = EpsilonGreedyAgent(self.no_arms, eps=self.epsilon)
 
             # Lists to store average rewards
             avg_rewards_ucb1 = []
             avg_rewards_epsilon_greedy = []
 
-            self.logger.info(f"Number of arms: {no_arms}")
-            self.logger.info(f"Number of iterations: {num_iterations}")
-            self.logger.info(f"Epsilon value: {epsilon}\n")
+            self.logger.info(f"Number of arms: {self.no_arms}")
+            self.logger.info(f"Number of iterations: {self.num_iterations}")
+            self.logger.info(f"Epsilon value: {self.epsilon}\n")
 
             # Simulate iterations
-            for i in range(num_iterations) :
+            for i in range(self.num_iterations) :
                 # Select arms for each agent
                 arm_ucb1 = ucb1_agent.select_arm()
                 arm_epsilon_greedy = epsilon_greedy_agent.select_arm()
@@ -143,13 +148,22 @@ class BanditSimulationGUI :
                 avg_rewards_epsilon_greedy.append(
                     np.mean(epsilon_greedy_agent.total_rewards / (epsilon_greedy_agent.num_pulls + 1e-6)))
 
-            # Plot the results
+            # Clear the axis before adding new lines
             self.ax.clear()
-            self.ax.plot(avg_rewards_ucb1, label='UCB1')
-            self.ax.plot(avg_rewards_epsilon_greedy, label='Epsilon-Greedy')
+
+            line_ucb1, = self.ax.plot(avg_rewards_ucb1, label='UCB1')
+            line_epsilon_greedy, = self.ax.plot(avg_rewards_epsilon_greedy, label='Epsilon-Greedy')
+
+            # Set the labels for X and Y axes
             self.ax.set_xlabel('Iterations')
             self.ax.set_ylabel('Average Reward')
+
+            # Set the legend to show labels for each line
             self.ax.legend()
+
+            # Add interactive data cursors to the plot
+            mplcursors.cursor(hover=True).connect("add", lambda selection : self.show_cursor_data(selection, line_ucb1,
+                                                                                                  line_epsilon_greedy))
 
             # Refresh the canvas
             self.canvas.draw()
@@ -162,6 +176,42 @@ class BanditSimulationGUI :
             self.logger.error(error_message)
             # Display an error box
             messagebox.showerror("Error", error_message)
+
+    def show_cursor_data(self, sel, line_ucb1, line_epsilon_greedy) :
+        """
+        Display additional information on the plot when hovering over data points.
+        """
+        try :
+            # Get the index of the hovered data point
+            index = sel.target.index
+
+            # Calculate the arm, iteration number, and epsilon based on the index
+            arm = index % int(self.no_arms)
+            iteration_number = index // int(self.no_arms)
+            eps = self.epsilon
+
+            # Check values to ensure they are in the correct range
+            if not (0 <= arm < self.no_arms) :
+                raise ValueError(f"Invalid value for arm: {arm}")
+
+            if not (0 <= iteration_number < self.num_iterations) :
+                raise ValueError(f"Invalid value for iteration_number: {iteration_number}")
+
+            if not (0 <= eps <= 1) :
+                raise ValueError(f"Invalid value for epsilon: {eps}")
+
+            # Create a label with the information
+            label = f"Arm: {arm}, Iteration: {iteration_number}, Epsilon: {eps:.2f}"
+
+            # Set the label text and adjust alpha for visibility
+            sel.annotation.set_text(label)
+            sel.annotation.get_bbox_patch().set_alpha(0.8)
+
+        except ValueError as ve :
+            self.logger.warning(f"Invalid value detected during hovering due to: {ve}")
+
+        except Exception as e :
+            self.logger.error(f"An error occurred during hovering due to: {str(e)}")
 
     def save_plot(self) :
         try :
