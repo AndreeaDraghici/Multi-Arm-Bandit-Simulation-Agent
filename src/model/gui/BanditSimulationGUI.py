@@ -191,12 +191,7 @@ class BanditSimulationGUI :
             self.clear_hover_labels()
 
             index = sel.target.index
-            """
-            # Calculate the arm, iteration number, and epsilon based on the index
-            arm = self.no_arms
-            iteration_number = index % self.num_iterations
-            eps = self.epsilon
- """
+
             # Calculate the arm, iteration number, and epsilon based on the index
             arm = index % self.no_arms
             total_iterations = self.num_iterations * self.no_arms
