@@ -148,6 +148,11 @@ class BanditSimulationGUI :
                 avg_rewards_epsilon_greedy.append(
                     np.mean(epsilon_greedy_agent.total_rewards / (epsilon_greedy_agent.num_pulls + 1e-6)))
 
+            # Ajustează lungimea listelor pentru a reflecta numărul total de iterații
+            total_iterations = self.num_iterations * self.no_arms
+            avg_rewards_ucb1 = avg_rewards_ucb1[:total_iterations]
+            avg_rewards_epsilon_greedy = avg_rewards_epsilon_greedy[:total_iterations]
+
             # Clear the axis before adding new lines
             self.ax.clear()
 
@@ -182,16 +187,23 @@ class BanditSimulationGUI :
         Display additional information on the plot when hovering over data points.
         """
         try :
-            # Get the index of the hovered data point
-            index = sel.target.index
+            # Clear previous hover labels
+            self.clear_hover_labels()
 
+            index = sel.target.index
+            """
             # Calculate the arm, iteration number, and epsilon based on the index
-            arm = index % int(self.no_arms)
-            iteration_number = index // int(self.no_arms)
+            arm = self.no_arms
+            iteration_number = index % self.num_iterations
+            eps = self.epsilon
+ """
+            # Calculate the arm, iteration number, and epsilon based on the index
+            arm = index % self.no_arms
+            total_iterations = self.num_iterations * self.no_arms
+            iteration_number = index % total_iterations
             eps = self.epsilon
 
-            # Check values to ensure they are in the correct range
-            if not (0 <= arm < self.no_arms) :
+            if not (0 <= arm <= self.no_arms) :
                 raise ValueError(f"Invalid value for arm: {arm}")
 
             if not (0 <= iteration_number < self.num_iterations) :
@@ -200,18 +212,33 @@ class BanditSimulationGUI :
             if not (0 <= eps <= 1) :
                 raise ValueError(f"Invalid value for epsilon: {eps}")
 
-            # Create a label with the information
-            label = f"Arm: {arm}, Iteration: {iteration_number}, Epsilon: {eps:.2f}"
-
             # Set the label text and adjust alpha for visibility
-            sel.annotation.set_text(label)
+            sel.annotation.set_text(f"Arm: {arm}, Iteration: {iteration_number}, Epsilon: {eps:.2f}")
             sel.annotation.get_bbox_patch().set_alpha(0.8)
+
+            # Update the legend to reflect the new labels
+            self.ax.legend()
 
         except ValueError as ve :
             self.logger.warning(f"Invalid value detected during hovering due to: {ve}")
 
         except Exception as e :
             self.logger.error(f"An error occurred during hovering due to: {str(e)}")
+
+    def clear_hover_labels(self) :
+        """
+        Clears the hover labels and legend.
+        """
+        try :
+            # Clear the legend
+            self.ax.get_legend().remove()
+
+            # Clear existing annotations
+            for annotation in self.ax.texts :
+                annotation.remove()
+
+        except Exception as e :
+            self.logger.error(f"An error occurred while clearing hover labels: {str(e)}")
 
     def save_plot(self) :
         try :
