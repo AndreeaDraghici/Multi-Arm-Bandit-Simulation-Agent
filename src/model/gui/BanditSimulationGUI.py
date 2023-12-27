@@ -4,6 +4,8 @@ import mplcursors
 import numpy as np
 import matplotlib.pyplot as plt
 from tkinter import Label, Button, Entry, filedialog, messagebox
+
+import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 
@@ -16,6 +18,7 @@ import time
 
 class BanditSimulationGUI :
     def __init__(self, root) :
+
         load_logging_config()
 
         # Get the logger for the 'staging' logger
@@ -24,6 +27,8 @@ class BanditSimulationGUI :
         self.no_arms = None
         self.epsilon = None
         self.num_iterations = None
+        self.iteration_time = None
+        self.execution_times = []
 
         """
         Initializes the BanditSimulationGUI.
@@ -129,6 +134,7 @@ class BanditSimulationGUI :
             self.logger.info(f"Number of iterations: {self.num_iterations}")
             self.logger.info(f"Epsilon value: {self.epsilon}\n")
 
+            start_time_iteration = time.time()
             # Simulate iterations
             for i in range(self.num_iterations) :
                 # Select arms for each agent
@@ -148,10 +154,20 @@ class BanditSimulationGUI :
                 avg_rewards_epsilon_greedy.append(
                     np.mean(epsilon_greedy_agent.total_rewards / (epsilon_greedy_agent.num_pulls + 1e-6)))
 
-            # Ajustează lungimea listelor pentru a reflecta numărul total de iterații
+                end_time = time.time()
+
+                # Calculate and log the iteration time
+                iteration_time = end_time - start_time_iteration
+                self.execution_times.append(iteration_time)
+                self.logger.info(f"Iteration {i + 1} took {iteration_time:.6f} seconds")
+
+            # Adjust the length of the lists to reflect the total number of iterations
             total_iterations = self.num_iterations * self.no_arms
             avg_rewards_ucb1 = avg_rewards_ucb1[:total_iterations]
             avg_rewards_epsilon_greedy = avg_rewards_epsilon_greedy[:total_iterations]
+
+            # Export to Excel after all iterations
+            # self.export_to_excel(self.execution_times, avg_rewards_ucb1, avg_rewards_epsilon_greedy)
 
             # Clear the axis before adding new lines
             self.ax.clear()
@@ -176,11 +192,39 @@ class BanditSimulationGUI :
             # Add the "Save Plot" option to the menu
             file_menu.add_command(label="Save Plot", command=self.save_plot)
 
+
         except Exception as e :
             error_message = f"An error occurred during the simulation due to: {str(e)}"
             self.logger.error(error_message)
             # Display an error box
             messagebox.showerror("Error", error_message)
+
+    """
+    def export_to_excel(self, execution_times, avg_rewards_ucb1, avg_rewards_epsilon_greedy) :
+        try :
+            # Create a DataFrame from the execution times and rewards
+            df = pd.DataFrame({
+                "Iteration" : range(1, len(execution_times) + 1),
+                "Execution Time (s)" : execution_times,
+                "Avg Reward UCB1" : avg_rewards_ucb1,
+                "Avg Reward Epsilon-Greedy" : avg_rewards_epsilon_greedy
+            })
+
+            # Save the DataFrame to an Excel file
+            output_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../../output')
+            if not os.path.exists(output_dir) :
+                os.makedirs(output_dir)
+
+            excel_filename = os.path.join(output_dir, 'Simulation_Results_Old.xlsx')
+            df.to_excel(excel_filename, index=False)
+
+            self.logger.info(f"Execution times and rewards exported to Excel: {excel_filename}")
+
+        except Exception as e :
+            error_message = f"An error occurred while exporting to Excel: {str(e)}"
+            self.logger.error(error_message)
+            raise e
+ """
 
     def show_cursor_data(self, sel, line_ucb1, line_epsilon_greedy) :
         """
