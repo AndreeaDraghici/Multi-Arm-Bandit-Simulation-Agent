@@ -2,3 +2,4 @@ numpy==1.24.4
 matplotlib==3.7.4
 pyyaml~=6.0.1
 mplcursors~=0.5.2
+pandas~=2.0.3
