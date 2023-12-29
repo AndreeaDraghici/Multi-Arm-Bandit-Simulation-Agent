@@ -1,7 +1,8 @@
-from src.LoadLoggingConfiguration import load_logging_config
 
 import logging
 import numpy as np
+
+from src.load_logging_configuration import load_logging_config
 
 
 class UCB1Agent :

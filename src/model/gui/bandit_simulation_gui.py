@@ -9,11 +9,13 @@ import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 
-from src.LoadLoggingConfiguration import load_logging_config
-from src.algorithm.Agents import UCB1Agent, EpsilonGreedyAgent
-from src.model.MultiArmedBandit import MultiArmedBandit
+
 from tkinter import Menu
 import time
+
+from src.algorithm.agents import UCB1Agent, EpsilonGreedyAgent
+from src.load_logging_configuration import load_logging_config
+from src.model.multi_armed_bandit import MultiArmedBandit
 
 
 class BanditSimulationGUI :
