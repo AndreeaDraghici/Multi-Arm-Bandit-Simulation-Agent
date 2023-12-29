@@ -1,24 +1,36 @@
 import logging
 
+import mplcursors
 import numpy as np
 import matplotlib.pyplot as plt
 from tkinter import Label, Button, Entry, filedialog, messagebox
+
+import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import os
 
-from src.LoadLoggingConfiguration import load_logging_config
-from src.algorithm.Agents import UCB1Agent, EpsilonGreedyAgent
-from src.model.MultiArmedBandit import MultiArmedBandit
+
 from tkinter import Menu
 import time
+
+from src.algorithm.agents import UCB1Agent, EpsilonGreedyAgent
+from src.load_logging_configuration import load_logging_config
+from src.model.multi_armed_bandit import MultiArmedBandit
 
 
 class BanditSimulationGUI :
     def __init__(self, root) :
+
         load_logging_config()
 
         # Get the logger for the 'staging' logger
         self.logger = logging.getLogger('staging')
+
+        self.no_arms = None
+        self.epsilon = None
+        self.num_iterations = None
+        self.iteration_time = None
+        self.execution_times = []
 
         """
         Initializes the BanditSimulationGUI.
@@ -103,29 +115,30 @@ class BanditSimulationGUI :
             with open(file_path, 'r') as file :
                 # Verify and parse the structure of the file
                 try :
-                    no_arms = int(file.readline().strip())
-                    num_iterations = int(file.readline().strip())
-                    epsilon = float(file.readline().strip())
+                    self.no_arms = int(file.readline().strip())
+                    self.num_iterations = int(file.readline().strip())
+                    self.epsilon = float(file.readline().strip())
                 except ValueError as ve :
                     raise ValueError("Invalid file structure. Please make sure the file contains valid data.") from ve
 
             # Create the multi-armed bandit
-            bandit = MultiArmedBandit(no_arms)
+            bandit = MultiArmedBandit(self.no_arms)
 
             # Create the agents
-            ucb1_agent = UCB1Agent(no_arms)
-            epsilon_greedy_agent = EpsilonGreedyAgent(no_arms, eps=epsilon)
+            ucb1_agent = UCB1Agent(self.no_arms)
+            epsilon_greedy_agent = EpsilonGreedyAgent(self.no_arms, eps=self.epsilon)
 
             # Lists to store average rewards
             avg_rewards_ucb1 = []
             avg_rewards_epsilon_greedy = []
 
-            self.logger.info(f"Number of arms: {no_arms}")
-            self.logger.info(f"Number of iterations: {num_iterations}")
-            self.logger.info(f"Epsilon value: {epsilon}\n")
+            self.logger.info(f"Number of arms: {self.no_arms}")
+            self.logger.info(f"Number of iterations: {self.num_iterations}")
+            self.logger.info(f"Epsilon value: {self.epsilon}\n")
 
+            start_time_iteration = time.time()
             # Simulate iterations
-            for i in range(num_iterations) :
+            for i in range(self.num_iterations) :
                 # Select arms for each agent
                 arm_ucb1 = ucb1_agent.select_arm()
                 arm_epsilon_greedy = epsilon_greedy_agent.select_arm()
@@ -143,13 +156,37 @@ class BanditSimulationGUI :
                 avg_rewards_epsilon_greedy.append(
                     np.mean(epsilon_greedy_agent.total_rewards / (epsilon_greedy_agent.num_pulls + 1e-6)))
 
-            # Plot the results
+                end_time = time.time()
+
+                # Calculate and log the iteration time
+                iteration_time = end_time - start_time_iteration
+                self.execution_times.append(iteration_time)
+                self.logger.info(f"Iteration {i + 1} took {iteration_time:.6f} seconds")
+
+            # Adjust the length of the lists to reflect the total number of iterations
+            total_iterations = self.num_iterations * self.no_arms
+            avg_rewards_ucb1 = avg_rewards_ucb1[:total_iterations]
+            avg_rewards_epsilon_greedy = avg_rewards_epsilon_greedy[:total_iterations]
+
+            # Export to Excel after all iterations
+            # self.export_to_excel(self.execution_times, avg_rewards_ucb1, avg_rewards_epsilon_greedy)
+
+            # Clear the axis before adding new lines
             self.ax.clear()
-            self.ax.plot(avg_rewards_ucb1, label='UCB1')
-            self.ax.plot(avg_rewards_epsilon_greedy, label='Epsilon-Greedy')
+
+            line_ucb1, = self.ax.plot(avg_rewards_ucb1, label='UCB1')
+            line_epsilon_greedy, = self.ax.plot(avg_rewards_epsilon_greedy, label='Epsilon-Greedy')
+
+            # Set the labels for X and Y axes
             self.ax.set_xlabel('Iterations')
             self.ax.set_ylabel('Average Reward')
+
+            # Set the legend to show labels for each line
             self.ax.legend()
+
+            # Add interactive data cursors to the plot
+            mplcursors.cursor(hover=True).connect("add", lambda selection : self.show_cursor_data(selection, line_ucb1,
+                                                                                                  line_epsilon_greedy))
 
             # Refresh the canvas
             self.canvas.draw()
@@ -157,11 +194,92 @@ class BanditSimulationGUI :
             # Add the "Save Plot" option to the menu
             file_menu.add_command(label="Save Plot", command=self.save_plot)
 
+
         except Exception as e :
             error_message = f"An error occurred during the simulation due to: {str(e)}"
             self.logger.error(error_message)
             # Display an error box
             messagebox.showerror("Error", error_message)
+
+    """
+    def export_to_excel(self, execution_times, avg_rewards_ucb1, avg_rewards_epsilon_greedy) :
+        try :
+            # Create a DataFrame from the execution times and rewards
+            df = pd.DataFrame({
+                "Iteration" : range(1, len(execution_times) + 1),
+                "Execution Time (s)" : execution_times,
+                "Avg Reward UCB1" : avg_rewards_ucb1,
+                "Avg Reward Epsilon-Greedy" : avg_rewards_epsilon_greedy
+            })
+
+            # Save the DataFrame to an Excel file
+            output_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../../output')
+            if not os.path.exists(output_dir) :
+                os.makedirs(output_dir)
+
+            excel_filename = os.path.join(output_dir, 'Simulation_Results_Old.xlsx')
+            df.to_excel(excel_filename, index=False)
+
+            self.logger.info(f"Execution times and rewards exported to Excel: {excel_filename}")
+
+        except Exception as e :
+            error_message = f"An error occurred while exporting to Excel: {str(e)}"
+            self.logger.error(error_message)
+            raise e
+ """
+
+    def show_cursor_data(self, sel, line_ucb1, line_epsilon_greedy) :
+        """
+        Display additional information on the plot when hovering over data points.
+        """
+        try :
+            # Clear previous hover labels
+            self.clear_hover_labels()
+
+            index = sel.target.index
+
+            # Calculate the arm, iteration number, and epsilon based on the index
+            arm = index % self.no_arms
+            total_iterations = self.num_iterations * self.no_arms
+            iteration_number = index % total_iterations
+            eps = self.epsilon
+
+            if not (0 <= arm <= self.no_arms) :
+                raise ValueError(f"Invalid value for arm: {arm}")
+
+            if not (0 <= iteration_number < self.num_iterations) :
+                raise ValueError(f"Invalid value for iteration_number: {iteration_number}")
+
+            if not (0 <= eps <= 1) :
+                raise ValueError(f"Invalid value for epsilon: {eps}")
+
+            # Set the label text and adjust alpha for visibility
+            sel.annotation.set_text(f"Arm: {arm}, Iteration: {iteration_number}, Epsilon: {eps:.2f}")
+            sel.annotation.get_bbox_patch().set_alpha(0.8)
+
+            # Update the legend to reflect the new labels
+            self.ax.legend()
+
+        except ValueError as ve :
+            self.logger.warning(f"Invalid value detected during hovering due to: {ve}")
+
+        except Exception as e :
+            self.logger.error(f"An error occurred during hovering due to: {str(e)}")
+
+    def clear_hover_labels(self) :
+        """
+        Clears the hover labels and legend.
+        """
+        try :
+            # Clear the legend
+            self.ax.get_legend().remove()
+
+            # Clear existing annotations
+            for annotation in self.ax.texts :
+                annotation.remove()
+
+        except Exception as e :
+            self.logger.error(f"An error occurred while clearing hover labels: {str(e)}")
 
     def save_plot(self) :
         try :
