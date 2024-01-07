@@ -109,7 +109,7 @@ class BanditSimulationGUI :
 
             # Add a "File" menu
             file_menu = Menu(menubar, tearoff=0)
-            menubar.add_cascade(label="File", menu=file_menu)
+            menubar.add_cascade(label="Save plot", menu=file_menu)
 
             # Read the number of arms, total iterations, and epsilon from the data file
             with open(file_path, 'r') as file :
@@ -168,9 +168,6 @@ class BanditSimulationGUI :
             avg_rewards_ucb1 = avg_rewards_ucb1[:total_iterations]
             avg_rewards_epsilon_greedy = avg_rewards_epsilon_greedy[:total_iterations]
 
-            # Export to Excel after all iterations
-            # self.export_to_excel(self.execution_times, avg_rewards_ucb1, avg_rewards_epsilon_greedy)
-
             # Clear the axis before adding new lines
             self.ax.clear()
 
@@ -200,33 +197,6 @@ class BanditSimulationGUI :
             self.logger.error(error_message)
             # Display an error box
             messagebox.showerror("Error", error_message)
-
-
-    def export_to_excel(self, execution_times, avg_rewards_ucb1, avg_rewards_epsilon_greedy) :
-        try :
-            # Create a DataFrame from the execution times and rewards
-            df = pd.DataFrame({
-                "Iteration" : range(1, len(execution_times) + 1),
-                "Execution Time (s)" : execution_times,
-                "Avg Reward UCB1" : avg_rewards_ucb1,
-                "Avg Reward Epsilon-Greedy" : avg_rewards_epsilon_greedy
-            })
-
-            # Save the DataFrame to an Excel file
-            output_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../../output')
-            if not os.path.exists(output_dir) :
-                os.makedirs(output_dir)
-
-            excel_filename = os.path.join(output_dir, 'Simulation_Results.xlsx')
-            df.to_excel(excel_filename, index=False)
-
-            self.logger.info(f"Execution times and rewards exported to Excel: {excel_filename}")
-
-        except Exception as e :
-            error_message = f"An error occurred while exporting to Excel: {str(e)}"
-            self.logger.error(error_message)
-            raise e
-
 
     def show_cursor_data(self, sel, line_ucb1, line_epsilon_greedy) :
         """
