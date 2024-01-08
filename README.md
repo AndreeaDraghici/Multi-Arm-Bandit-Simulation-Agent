@@ -15,7 +15,7 @@ learning, where an agent must choose between multiple actions (arms) to maximize
 
 ## Installation
 
-###  **Step 1: Install Python**
+### **_Step 1: Install Python_**
 _**Download Python:**_
 Visit [python.org](https://www.python.org/downloads/). and download the 3.8 version of Python for your operating system.
 
@@ -46,6 +46,7 @@ Run the following commands to clone the repository:
 
 ### **_Step 4: Create and Activate Virtual Environment (Optional)_**
 Create a Virtual Environment (Optional but Recommended).
+
 **Create Virtual Environment:**
 If you want to create a virtual environment, run the following commands:
 
@@ -64,6 +65,7 @@ Open a terminal/command prompt and go to the project directory:
 
 **Install Dependencies:**
 Install the necessary libraries listed in **_requirements.txt_**:
+
 Run the following command to install the required libraries:
 
 `pip install -r requirements.txt`
@@ -84,6 +86,7 @@ Open a terminal or File Explorer and go to the "_dist_" folder within your proje
 
 `cd /path/to/Multi-Arm-Bandit-Agent/dist
 `
+
 **Run the Executable:**
 Execute the following command to run the executable file:
 
