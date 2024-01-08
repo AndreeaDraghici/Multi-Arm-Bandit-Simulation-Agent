@@ -109,7 +109,7 @@ class BanditSimulationGUI :
 
             # Add a "File" menu
             file_menu = Menu(menubar, tearoff=0)
-            menubar.add_cascade(label="Save plot", menu=file_menu)
+            menubar.add_cascade(label="File", menu=file_menu)
 
             # Read the number of arms, total iterations, and epsilon from the data file
             with open(file_path, 'r') as file :
