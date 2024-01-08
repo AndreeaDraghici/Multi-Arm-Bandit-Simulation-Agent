@@ -1,6 +1,9 @@
 # Multi-Arm-Bandit-Agent
 
-Homework at Multi-Agent Learning course
+Homework at Multi-Agent Learning course --->
+To implement an agent that wants to optimize the operation of a multi-slot machine
+(multi-arm bandit) with several actuation arms. The agent will experience at least 2
+learning strategies taken from specialized literature.
 
 ### Introduction
 
@@ -10,11 +13,32 @@ learning, where an agent must choose between multiple actions (arms) to maximize
 
 ------------------
 
-### Installation
+## Installation
 
-To run the simulation, follow these steps:
+###  **Step 1: Install Python**
+_**Download Python:**_
+Visit [python.org](https://www.python.org/downloads/). and download the 3.8 version of Python for your operating system.
 
-- Clone the repository to your local machine.
+
+**_Install Python:_**
+Follow the installation instructions provided on the Python website. During installation, make sure to check the option
+to add Python to your system PATH.
+
+### **_Step 2: Install PyCharm_**
+**_Download PyCharm:_**
+Visit JetBrains [PyCharm](https://www.jetbrains.com/pycharm/download/) download and download the Community Edition, which is free.
+
+**_Install PyCharm:_**
+Follow the installation instructions provided on the PyCharm website.
+
+### _**Step 3: Clone the Repository**_
+
+**Open Terminal/Command Prompt:**
+Open your terminal or command prompt.
+
+
+**Clone the Repository to your local machine:**
+Run the following commands to clone the repository:
 
 `git clone https://github.com/your-username/Multi-Arm-Bandit-Agent.git`
 
@@ -25,8 +49,10 @@ To run the simulation, follow these steps:
   Make sure you have Python installed on your system. You can download it
   from [python.org](https://www.python.org/downloads/).
 
-
-- Create a Virtual Environment (Optional but Recommended).
+### **_Step 4: Create and Activate Virtual Environment (Optional)_**
+Create a Virtual Environment (Optional but Recommended).
+**Create Virtual Environment:**
+If you want to create a virtual environment, run the following commands:
 
 `python -m venv venv`
 
@@ -34,21 +60,39 @@ To run the simulation, follow these steps:
 
 Activating the virtual environment isolates the project dependencies.
 
-- Navigate to the project directory in the terminal.
+### _**Step 5: Install Dependencies**_
+
+**Navigate to the Project Directory:**
+Open a terminal/command prompt and go to the project directory:
 
 `cd /path/to/Multi-Arm-Bandit-Agent`
 
-- Install the required dependencies:
-
-  Install the necessary libraries listed in **_requirements.txt_**:
+**Install Dependencies:**
+Install the necessary libraries listed in **_requirements.txt_**:
+Run the following command to install the required libraries:
 
 `pip install -r requirements.txt`
 
-- Run the GUI application:
+### **_Step 6: Run the GUI Application_**
 
-  Execute the following command to launch the GUI application:
+Execute the following command to launch the GUI application:
 
 **`python main.py`**
+
+
+**Alternative Step**
+
+Or, application provides an executable (**_exe_**) file in the '_dist_' directory, users can follow these alternative steps to run the application:
+
+**Navigate to the "_dist_" directory:**
+Open a terminal or File Explorer and go to the "_dist_" folder within your project directory.
+
+`cd /path/to/Multi-Arm-Bandit-Agent/dist
+`
+**Run the Executable:**
+Execute the following command to run the executable file:
+
+`./multi_arm_agent.exe  # On Windows, simply double-click the executable file`
 
 -------------------
 
@@ -135,7 +179,7 @@ Each run of the simulation generates a unique output plot, and the plots are sav
 
 --------------------
 
-### Notes:
+### Additional Notes:
 
 - _**Virtual Environment (Optional):**_
 
@@ -149,6 +193,15 @@ Each run of the simulation generates a unique output plot, and the plots are sav
   specified.
 
 
+
 - **_Output:_**
 
   Output plots will be saved in the output directory with unique timestamps.
+
+### **_!  NOTE !_**
+
+Ensure that any dependencies or required files are present in the same directory as the executable.
+
+If there are any issues running the executable, check for error messages in the terminal or logs and troubleshoot accordingly.
+
+Using the executable provides a more straightforward way for users to run the application without needing to directly interact with the Python scripts.
