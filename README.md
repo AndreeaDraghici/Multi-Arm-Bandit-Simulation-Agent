@@ -93,13 +93,13 @@ Execute the following command to launch the GUI application:
 
 **Alternative Step**
 
-Or, application provides an executable (**_exe_**) file in the '_dist_' directory, users can follow these alternative
+Or, application provides an executable (**_exe_**) file in the ' dist/run ' directory, users can follow these alternative
 steps to run the application:
 
 **Navigate to the "_dist_" directory:**
 Open a terminal or File Explorer and go to the "_dist_" folder within your project directory.
 
-`cd /path/to/Multi-Arm-Bandit-Simulation-Agent/dist
+`cd /path/to/Multi-Arm-Bandit-Simulation-Agent/dist/run
 `
 
 **Run the Executable:**
