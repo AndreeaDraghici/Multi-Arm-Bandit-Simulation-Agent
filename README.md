@@ -44,11 +44,6 @@ Run the following commands to clone the repository:
 
 `cd Multi-Arm-Bandit-Agent`
 
-- Ensure you have **_Python 3.8_** installed on your system.
-
-  Make sure you have Python installed on your system. You can download it
-  from [python.org](https://www.python.org/downloads/).
-
 ### **_Step 4: Create and Activate Virtual Environment (Optional)_**
 Create a Virtual Environment (Optional but Recommended).
 **Create Virtual Environment:**
