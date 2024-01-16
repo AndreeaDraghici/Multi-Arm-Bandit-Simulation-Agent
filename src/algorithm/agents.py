@@ -1,4 +1,3 @@
-
 import logging
 import numpy as np
 
@@ -10,6 +9,10 @@ class UCB1Agent :
         """
         Initializes a UCB1 agent with a given number of arms.
         :param no_arm: Number of arms in the bandit.
+
+        Initializes two arrays: total_rewards and num_pulls, both of size no_arm, to zero.
+        These arrays will track the total rewards and number of times each arm has been pulled, respectively.
+        Initializes a timestep variable to 0, which will keep track of the number of times an arm has been selected.
         """
         try :
             # Check if the number of arms is at least 2
@@ -39,12 +42,20 @@ class UCB1Agent :
         """
         Selects an arm based on the UCB1 strategy.
         :return: The selected arm.
+
+        Increments the timestep.
+        Calculates an "exploration bonus" for each arm using the UCB1 formula. This bonus encourages exploration of less-pulled arms.
+        Calculates the UCB values for each arm, which is the sum of the average reward of the arm and its exploration bonus.
+        Selects the arm with the highest UCB value.
         """
         try :
             # Increment timestep
             self.timestep += 1
 
             # Calculate exploration bonus using UCB1 formula
+            # the formula involves dividing by the number of times an arm has been pulled (self.num_pulls).
+            # If an arm has never been pulled, this value would be zero, leading to a division by zero error.
+            # Adding a small number like 1e-6 ensures that the denominator is never zero, thus avoiding this error.
             exploration_bonus = np.sqrt(2 * np.log(self.timestep) / (self.num_pulls + 1e-6))
 
             # Calculate UCB values for each arm
@@ -65,6 +76,10 @@ class UCB1Agent :
         Updates the agent's knowledge after pulling an arm and receiving a reward.
         :param arm: The arm that was pulled.
         :param reward: The received reward.
+
+        Takes the index of an arm and the reward received from pulling that arm.
+        Checks if the provided arm index is valid. If not, it raises a ValueError.
+        Updates the total_rewards and num_pulls arrays for the pulled arm.
         """
         try :
             # Check if the arm index is valid
@@ -121,7 +136,9 @@ class EpsilonGreedyAgent :
                 selected_arm = np.random.choice(self.num_arms)
                 self.logger.info(f"Epsilon-Greedy Agent exploring: Selected arm randomly: {selected_arm}")
             else :
-                # Exploit the arm with the highest average reward
+                # Exploit the arm with the highest average reward.
+                # Calculates the average reward for each arm.
+                # To avoid division by zero, `1e-6` (a small number) is added to `self.num_pulls`. This ensures numerical stability.
                 avg_rewards = self.total_rewards / (self.num_pulls + 1e-6)
                 selected_arm = np.argmax(avg_rewards)
 
@@ -142,7 +159,9 @@ class EpsilonGreedyAgent :
         """
         try :
             # Update total rewards and number of pulls for the selected arm
+            # Updates the total rewards for the pulled arm by adding the received reward.
             self.total_rewards[arm] += reward
+            # Increments the count of how many times the arm has been pulled.
             self.num_pulls[arm] += 1
 
             self.logger.info(f"Epsilon-Greedy Agent updated for arm {arm}: Total Rewards={self.total_rewards[arm]}, "

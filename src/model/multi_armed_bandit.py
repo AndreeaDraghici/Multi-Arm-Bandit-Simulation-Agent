@@ -1,37 +1,45 @@
 import numpy as np
 import logging
 
-class MultiArmedBandit:
-    def __init__(self, no_arm):
+
+# This class simulates a multi-armed bandit problem, where each arm of the bandit provides a reward drawn from a normal distribution.
+class MultiArmedBandit :
+    def __init__(self, no_arm) :
         """
-            Initializes a Multi-Armed Bandit with a given number of arms.
+            The constructor initializes the bandit with a given number of arms and sets up the mean rewards for each arm, sampled from a normal distribution.
 
             :param no_arm: Number of arms in the bandit.
         """
-        try:
+        try :
+            # This line sets the number of arms (num_arms) for the bandit instance to the value provided in no_arm.
             self.num_arms = no_arm
-            # Mean reward for each arm sampled from a normal distribution
+
+            # Generates a list of true_means for each arm. Each mean is drawn from a normal distribution with a mean of 0 and a standard deviation of 1.
+            # The length of this list is equal to the number of arms (no_arm).
+            # These means represent the expected reward for each arm.
             self.true_means = np.random.normal(0, 1, no_arm)
-        except Exception as e:
+        except Exception as e :
             logging.error(f"Error during MultiArmedBandit initialization due to: {str(e)}")
             raise e
 
-    def pull_arm(self, arm):
+    def pull_arm(self, arm) :
         """
-            Simulates pulling a specific arm and returns a reward sampled from a normal distribution.
+            Method simulates the action of pulling an arm and receiving a reward based on the underlying distribution of that arm.
 
             :param arm: The arm to be pulled.
             :return: The sampled reward.
         """
-        try:
+        try :
             # Check if the arm index is valid
-            if arm < 0 or arm >= self.num_arms:
+            if arm < 0 or arm >= self.num_arms :
                 raise ValueError(f"Invalid arm index: {arm}")
 
-            # Sample a reward from a normal distribution with mean true_means[arm] and standard deviation 1
+            # Samples a reward for the specified arm.
+            # The reward is drawn from a normal distribution with the mean equal to the true mean of that arm (self.true_means[arm])
+            # and a standard deviation of 1.
             reward = np.random.normal(self.true_means[arm], 1)
 
             return reward
-        except Exception as e:
+        except Exception as e :
             logging.error(f"Error during arm pulling due to: {str(e)}")
             raise e
